@@ -4,6 +4,8 @@ import 'package:stock_manager/presentation/bloc/inventory/stock_movement_bloc.da
 import 'package:stock_manager/presentation/widgets/inventory/stock_movement_form.dart';
 import 'package:stock_manager/utils/constants/strings.dart';
 
+import '../../../domain/repositories/inventory_repository.dart';
+
 class StockMovementScreen extends StatelessWidget {
   final int productId;
 
@@ -11,13 +13,16 @@ class StockMovementScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final inventoryRepo = RepositoryProvider.of<InventoryRepository>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(Strings.stockMovement),
       ),
       body: BlocProvider(
         create: (context) => StockMovementBloc(
-          inventoryRepository: context.read(),
+          // inventoryRepository: context.read(),
+          inventoryRepository: inventoryRepo,
           productId: productId,
         )..add(LoadStockMovements()),
         child: Padding(

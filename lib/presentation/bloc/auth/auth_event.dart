@@ -10,3 +10,11 @@ class LoginRequested extends AuthEvent {
 }
 
 class LogoutRequested extends AuthEvent {}
+
+class AppStarted extends AuthEvent {}
+
+class LoginSuccess extends AuthEvent {
+  final User user;
+
+  LoginSuccess(this.user);
+}

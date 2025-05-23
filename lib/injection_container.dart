@@ -1,3 +1,4 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:get_it/get_it.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -38,7 +39,8 @@ Future<void> init() async {
 
   // Core Services
   sl.registerSingleton<HiveService>(HiveService());
-  sl.registerSingleton<ConnectivityService>(ConnectivityService());
+  final connectivity = Connectivity();
+  sl.registerSingleton<ConnectivityService>(ConnectivityService(connectivity));
   sl.registerSingleton<NotificationService>(NotificationService());
 
   // Local DB Helper

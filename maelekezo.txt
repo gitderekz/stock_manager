@@ -1,0 +1,80 @@
+Let's solve the error
+[
+1 positional argument expected by 'AuthApi.new', but 0 found. (Documentation)
+The named parameter 'hiveService' is required, but there's no corresponding argument. (Documentation)  Try adding the required argument.
+The named parameter 'sharedPreferences' is required, but there's no corresponding argument. (Documentation)  Try adding the required argument.
+
+The argument type 'AuthRepository (where AuthRepository is defined in C:\dev\mobile\stock_manager\lib\data\repositories\auth_repository.dart)' can't be assigned to the parameter type 'AuthRepository (where AuthRepository is defined in C:\dev\mobile\stock_manager\lib\domain\repositories\auth_repository.dart)'. (Documentation)
+AuthRepository is defined in C:\dev\mobile\stock_manager\lib\data\repositories\auth_repository.dart (auth_repository.dart:9).
+AuthRepository is defined in C:\dev\mobile\stock_manager\lib\domain\repositories\auth_repository.dart (auth_repository.dart:4).
+]
+
+Given
+lib/main.dart
+.
+.
+.
+lib/data/datasources/remote/auth_api.dart
+.
+.
+.
+lib/data/datasources/local/auth_local.dart [Also can we modify "saveUser" function]
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+****************************************************************
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

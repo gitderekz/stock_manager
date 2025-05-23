@@ -11,6 +11,8 @@ class DatabaseHelper {
 
   // Singleton pattern
   static final DatabaseHelper instance = DatabaseHelper._internal();
+  // Factory constructor
+  factory DatabaseHelper() => instance;
   DatabaseHelper._internal();
 
   static Database? _database;
@@ -19,6 +21,7 @@ class DatabaseHelper {
     _database = await _initDatabase();
     return _database!;
   }
+
 
   Future<Database> _initDatabase() async {
     final path = join(await getDatabasesPath(), _databaseName);
@@ -233,6 +236,7 @@ class DatabaseHelper {
       name: map['name'],
       productTypeId: map['product_type_id'],
       categoryId: map['category_id'],
+      quantity: map['quantity'],
       basePrice: map['base_price'],
       description: map['description'],
       isActive: map['is_active'] == 1,

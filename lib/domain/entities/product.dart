@@ -34,9 +34,6 @@
 //   }
 // }
 
-
-
-
 class Product {
   final int id;
   final String name;
@@ -47,6 +44,9 @@ class Product {
   final bool isActive;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final int quantity; // Added for stock management
+  final int lowStockThreshold; // Added for alerts
+  final String? imageUrl; // Added for product images
 
   Product({
     required this.id,
@@ -58,6 +58,9 @@ class Product {
     required this.isActive,
     required this.createdAt,
     required this.updatedAt,
+    required this.quantity, // Added
+    this.lowStockThreshold = 5, // Default threshold
+    this.imageUrl, // Added
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
@@ -67,10 +70,13 @@ class Product {
       productTypeId: json['productTypeId'],
       categoryId: json['categoryId'],
       basePrice: json['basePrice'].toDouble(),
-      description: json['description'] ?? '',
+      description: json['description'],
       isActive: json['isActive'],
-      createdAt: json['createdAt'],
-      updatedAt: json['updatedAt'],
+      createdAt: DateTime.parse(json['createdAt']),
+      updatedAt: DateTime.parse(json['updatedAt']),
+      quantity: json['quantity'] ?? 0, // Added
+      lowStockThreshold: json['lowStockThreshold'] ?? 5, // Added
+      imageUrl: json['imageUrl'], // Added
     );
   }
 
@@ -83,8 +89,11 @@ class Product {
       'basePrice': basePrice,
       'description': description,
       'isActive': isActive,
-      'createdAt': createdAt,
-      'updatedAt': updatedAt,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
+      'quantity': quantity, // Added
+      'lowStockThreshold': lowStockThreshold, // Added
+      'imageUrl': imageUrl, // Added
     };
   }
 }

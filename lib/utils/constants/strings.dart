@@ -57,4 +57,20 @@ class Strings {
   static const String stockMovement = 'Stock Movement';
   static const String noMovementsFound = 'No movements found';
 
+  static const online = 'Online';
+  static const offline = 'Offline';
+  static const quickStats = 'Quick Stats';
+  static const totalProducts = 'Total Products';
+  static const lowStock = 'Low Stock';
+  static const outOfStock = 'Out of Stock';
+  static const quickActions = 'Quick Actions';
+  static const viewProducts = 'View Products';
+  static const newOrder = 'New Order';
+  static const reports = 'Reports';
+  static const lowStockAlerts = 'Low Stock Alerts';
+  static const noLowStockItems = 'No low stock items';
+  static const recentActivities = 'Recent Activities';
+  static const remaining = 'Remaining';
+  static const loadingProducts = 'Loading products...';
+
 }

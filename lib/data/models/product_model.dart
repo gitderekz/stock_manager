@@ -10,7 +10,7 @@ class ProductModel extends Product {
     required super.description,
     required super.isActive,
     required super.createdAt,
-    required super.updatedAt,
+    required super.updatedAt, required super.quantity,
   });
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
@@ -23,7 +23,7 @@ class ProductModel extends Product {
       description: json['description'],
       isActive: json['is_active'],
       createdAt: DateTime.parse(json['created_at']),
-      updatedAt: DateTime.parse(json['updated_at']),
+      updatedAt: DateTime.parse(json['updated_at']), quantity: json['quantity'],
     );
   }
 
@@ -47,6 +47,7 @@ class ProductModel extends Product {
       name: product.name,
       productTypeId: product.productTypeId,
       categoryId: product.categoryId,
+      quantity: product.quantity,
       basePrice: product.basePrice,
       description: product.description,
       isActive: product.isActive,

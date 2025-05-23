@@ -21,7 +21,7 @@ dependencies:
   intl: ^0.18.0
   flutter_localizations:
     sdk: flutter
-  connectivity_plus: #^3.0.2
+#  connectivity_plus: #^3.0.2
   hydrated_bloc: ^9.0.0
   flutter_secure_storage: ^7.0.0
   syncfusion_flutter_datagrid: ^20.2.48
@@ -39,6 +39,8 @@ dependencies:
   flutter_local_notifications:
   get_it: ^8.0.3
   flutter_localized_locales:
+  socket_io_client:
+  connectivity_plus: ^6.1.4
 
 dev_dependencies:
   flutter_test:

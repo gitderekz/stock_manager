@@ -9,7 +9,7 @@ class NetworkStatusBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<ConnectivityCubit, ConnectivityState>(
       builder: (context, state) {
-        if (state is ConnectivityDisconnected) {
+        if (state is ConnectivityConnected) {
           return Container(
             padding: const EdgeInsets.symmetric(vertical: 4),
             color: Colors.red,
