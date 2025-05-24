@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 extension ContextExtensions on BuildContext {
   ThemeData get theme => Theme.of(this);
@@ -15,5 +16,9 @@ extension ContextExtensions on BuildContext {
         backgroundColor: isError ? colorScheme.error : colorScheme.primary,
       ),
     );
+  }
+
+  String formatDateTime(DateTime dateTime) {
+    return DateFormat.yMMMd().add_jm().format(dateTime);
   }
 }

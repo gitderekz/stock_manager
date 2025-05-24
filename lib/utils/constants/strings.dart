@@ -57,6 +57,7 @@ class Strings {
   static const String stockMovement = 'Stock Movement';
   static const String noMovementsFound = 'No movements found';
 
+
   static const online = 'Online';
   static const offline = 'Offline';
   static const quickStats = 'Quick Stats';
@@ -73,4 +74,15 @@ class Strings {
   static const remaining = 'Remaining';
   static const loadingProducts = 'Loading products...';
 
+
+  // Home
+  static const inventorySummary = 'inventorySummary';
+  static const totalItems = 'totalItems';
+  static const viewAll = 'viewAll';
+  static const noRecentActivities = 'noRecentActivities';
+  static const formatDateTime = 'formatDateTime';
+
+  static const currentStock = 'currentStock';
+  static const confirm = 'confirm';
+  static const movementType = 'movementType';
 }

@@ -1,0 +1,7 @@
+{
+  "@@locale": "es",
+  "language": "Language",
+  "theme": "Theme",
+  "lightMode": "Light Mode",
+  "darkMode": "Dark Mode"
+}

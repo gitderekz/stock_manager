@@ -585,6 +585,105 @@ ROUTES
 "stock-management-system\backend\routes\stockMovementRoutes.js"
 "stock-management-system\backend\routes\syncQueueRoutes.js"
 
+server.js
+
+
+app.js
+
+
+----------------------------------------------------------------------------
+HERE IS THE FLUTTER/MOBILE PROJECT STRUCTURE
+lib/
+├── config/
+│   ├── routes.dart
+│   ├── localization.dart
+│   └── theme.dart
+├── controllers/
+│   ├── product_controller.dart
+│   ├── auth_controller.dart
+│   ├── sync_controller.dart
+│   └── stock_controller.dart
+├── models/
+│   └── product.dart
+├── pages/
+│   ├── home_page.dart
+│   ├── main_navigation.dart
+│   ├── product_details.dart
+│   ├── products_page.dart
+│   ├── settings_page.dart
+│   ├── inventory_page.dart
+│   ├── notification_page.dart
+│   ├── login_screen.dart
+│   ├── notifications_screen.dart
+│   ├── profile_screen.dart
+│   ├── sync_screen.dart
+│   └── stock_movement.dart
+├── utils/
+│   ├── constants/
+│   │   ├── environment.dart
+│   │   └── strings.dart
+│   ├── helpers/
+│   │   ├── barcode_scanner.dart
+│   │   ├── database.dart
+│   │   └── preferences.dart
+│   │   └── database_helper.dart
+│   └── services/
+│       ├── background_sync_service.dart
+│       ├── connectivity_service.dart
+│       ├── notification_service.dart
+│       └── sync_service.dart
+└── main.dart
+
+
+
+
+
+Here are my simple requirements, it should have..
+1. dark & light mode
+2. multiple language
+3. manage stock in,out,available
+4. The following screens
+[
+ -  home screen wih dashboard, stats, low stock alert
+ -  products
+ -  settings
+ -  product details
+ -
+]
+5. Use sqfllite
+6. Use block for state management
+7 use shared_preferences if you have too
+
+Since i've learned from previous rabit hole,Now project should have simple structure(very few files & folders)
+- Models
+- Controllers
+- Routes
+- Pages
+- utils
+- config
+
+Dont complicate anything, lets use 2hrs to finish this
+
+
+
+
+
+===>PLEASE ANALYSE EVERYTHING AND STORE,UPDATE YOUR MEMORY & KEEP THESE DETAILS FOR FUTURE USE IN ALL CONVERSATION THAT WE'LL HAVE ABOUT IT
+
+===>If you need me to provide any file that i've not yet provided just ask
+===>Lets implement and complete all the functionalities of [stock in, out, available, search items, stats & cards in dashboard home, recent activities, settings, light&dark mode switching, language switching, and other mobile-to-backend related things ]
+===>Make appearance/interface more appealing, user friendly, professional & futuristics.
+===>Remember to make codes very simple, and professional looking based on themes also
+
+
+
+
+
+
+
+
+
+
 
 ----------------------------------------------------------------------------
 HERE IS THE FLUTTER/MOBILE PROJECT STRUCTURE
@@ -898,3 +997,6 @@ THSESE ARE MISSING & IF THEY ARE NOT IMPORTANT DON'T IMPLEMENT THEM
 ===>You can modify the appearance/interface to make it more appealing, user friendly, professional & futuristics.
 ===>Remember to make codes very simple
 
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
