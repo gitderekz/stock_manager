@@ -2,6 +2,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:stock_manager/config/env.dart';
+import 'package:stock_manager/controllers/auth_controller.dart';
+import 'package:stock_manager/utils/database_helper.dart';
+import 'package:stock_manager/utils/sync_service.dart';
 import '../controllers/language_controller.dart';
 import '../controllers/theme_controller.dart';
 
@@ -65,6 +69,58 @@ class SettingsPage extends StatelessWidget {
                       onChanged: (_) => context.read<ThemeCubit>().toggleTheme(),
                     );
                   },
+                ),
+              ],
+            ),
+          ),
+        ),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Data Synchronization',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                ElevatedButton(
+                  onPressed: () async {
+                    await SyncService(
+                      dbHelper: DatabaseHelper.instance,
+                      apiUrl: Env.baseUrl,
+                    ).syncAllData(context);
+
+                  },
+                  child: const Text('Sync Data Now'),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Leaving',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        context.read<AuthCubit>().logout();
+                        Navigator.pushNamedAndRemoveUntil(
+                          context,
+                          '/',
+                              (route) => false,
+                        );
+                      },
+                      child: Text('Logout'),
+                    ),
+                  ],
                 ),
               ],
             ),

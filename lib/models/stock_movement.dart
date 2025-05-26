@@ -70,4 +70,36 @@ class StockMovement {
       isSynced: map['is_synced'] == 1,
     );
   }
+
+  factory StockMovement.fromJson(Map<String, dynamic> json) {
+    return StockMovement(
+      id: json['id'],
+      productId: json['product_id'],
+      movementType: json['movement_type'],
+      quantity: json['quantity'],
+      reference: json['reference'],
+      notes: json['notes'],
+      userId: json['user_id'],
+      movementDate: DateTime.parse(json['movement_date']),
+      isSynced: json['is_synced'] == 1,
+      productName: json['product_name'] ?? '', // fallback if null
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'product_id': productId,
+      'movement_type': movementType,
+      'quantity': quantity,
+      'reference': reference,
+      'notes': notes,
+      'user_id': userId,
+      'movement_date': movementDate.toIso8601String(),
+      'is_synced': isSynced ? 1 : 0,
+      'product_name': productName,
+    };
+  }
+
+
 }

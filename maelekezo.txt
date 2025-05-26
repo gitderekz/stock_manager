@@ -107,8 +107,13 @@ GIVEN
 
 
 --------------------------------------------------------------
-If i've always been git push to main branch,
-How can i push to a different branch now but same repository
+Thank you so much
+
+--->Everytime i open the app it leads me to login screen even if i'm logged in instead on skipping the login
+
+
+
+
 
 
 -----------------------------------------------------------

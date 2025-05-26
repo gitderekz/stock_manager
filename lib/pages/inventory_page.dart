@@ -16,7 +16,7 @@ class InventoryPage extends StatelessWidget {
           final lowStockItems = state.products
               .where((p) => p.quantity <= p.lowStockThreshold)
               .toList();
-
+// print("INVENTORY: ${state.products.first.name}, ${state.products.first.quantity}, ${state.products.first.lowStockThreshold}");
           return ListView(
             padding: const EdgeInsets.all(16),
             children: [

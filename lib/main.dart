@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stock_manager/config/env.dart';
+import 'package:stock_manager/controllers/stock_controller.dart';
 import 'package:stock_manager/utils/socket_service.dart';
 import 'config/routes.dart';
 import 'config/theme.dart';
@@ -45,6 +46,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => LanguageCubit(prefs)),
         BlocProvider(create: (_) => AuthCubit(dbHelper)),
         BlocProvider(create: (_) => ProductCubit(dbHelper)),
+        BlocProvider(create: (_) => StockCubit(dbHelper)),
       ],
       child: BlocBuilder<ThemeCubit, ThemeState>(
         builder: (context, themeState) {

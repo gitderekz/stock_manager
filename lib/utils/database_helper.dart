@@ -1,4 +1,6 @@
 // utils/database_helper.dart
+import 'dart:convert';
+
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import '../models/product.dart';
@@ -127,6 +129,14 @@ class DatabaseHelper {
     return await db.insert(movementsTable, movement.toMap());
   }
 
+  Future<List<StockMovement>> getStockMovements() async {
+    final db = await database;
+    final maps = await db.query(DatabaseHelper.movementsTable);
+
+    return maps.map((map) => StockMovement.fromMap(map)).toList();
+  }
+
+
   // Sync queue operations
   Future<int> addToSyncQueue(String table, int id, String operation, Map<String, dynamic> data) async {
     final db = await database;
@@ -134,7 +144,8 @@ class DatabaseHelper {
       'table_name': table,
       'record_id': id,
       'operation': operation,
-      'data': data.toString(),
+      // 'data': data.toString(),
+      'data': jsonEncode(data),
       'is_synced': 0
     });
   }

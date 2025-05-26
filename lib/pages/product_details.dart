@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stock_manager/config/env.dart';
+import 'package:stock_manager/controllers/auth_controller.dart';
+import 'package:stock_manager/controllers/stock_controller.dart';
 import '../controllers/product_controller.dart';
 import '../models/product.dart';
 import '../models/stock_movement.dart';
@@ -95,17 +97,27 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       return;
     }
 
+    // Validate stock out doesn't exceed available quantity
+    if (_movementType == 'out' && quantity > widget.product.quantity) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Insufficient stock')));
+      return;
+    }
+
     final movement = StockMovement(
       id: DateTime.now().millisecondsSinceEpoch,
       productId: widget.product.id,
       movementType: _movementType,
       quantity: quantity,
-      userId: 1, // TODO: Replace with actual user ID
+      // userId: context.read<AuthCubit>().state.user?.id ?? 1,
+      userId: context.read<AuthCubit>().state.userData?['id'] ?? 1,
       movementDate: DateTime.now(),
       productName: widget.product.name,
+      reference: _movementType == 'out' ? 'Sale' : 'Restock',
     );
 
-    context.read<ProductCubit>().addStockMovement(movement);
+    context.read<StockCubit>().recordMovement(movement);
+    context.read<ProductCubit>().fetchProducts(); // Refresh product list
     Navigator.pop(context);
   }
 
