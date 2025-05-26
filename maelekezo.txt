@@ -107,13 +107,1404 @@ GIVEN
 
 
 --------------------------------------------------------------
-Thank you so much
-
---->Everytime i open the app it leads me to login screen even if i'm logged in instead on skipping the login
-
-
-
-
 
 
 -----------------------------------------------------------
+Hello deepseek im stuck while we were solving a problem and you said to start a new chat
+This was what we were doing
+
+*===> Firstly we started here
+[hello, do you know anything about stock softwares with key points stock[ in, out, present, ]  where it should be storing different items/goods let's say for example Mobile phones then it should have store[imei,storage,color,picture(s),name,price e.t.c]
+
+lets say i'll use flutter, nodejs for backend and reactjs for web frontend . And this app will not only deal with phones but other products too like [clothes -men/women-top/bottom-shoes], laptops, phone covers e.t.c it'll need to be dynamic in dealing with different types of products & entries we'll need to achieve this
+
+Great so now generate coding development flow start with ->backend(& database)->mobile app-> web frontend.
+-database is mysql, and for ids i'll prefer numbers over uuid,
+-all tables in small letters,
+-Implement light/dark mode
+-Multilanguage
+- There should be a switch from backend/table that allows to operate offline if enabled but by default it should operate only online
+-Incase there is no internet to communicate with online server implement(online/offline) so as when internet is back there should be a means to sync data to server again
+-Same for login should be able to login offline incase on internet problems
+- implement notifications feature for (various stock alerts like few items remain e.t.c)
+-Responsive UI across different devices
+-Analyse carefully&keen on how the interfaces/screens should look like
+
+-ALSO DO ANYTHING THAT YOU THINK WILL BE PREFERED AND USEFUL FEATURES
+-Rmember to keep it simple and clear no need for complicated processes,
+
+-For colors ill prefer
+// Base colors
+$color-primary: #461B93;
+$color-secondary: #6A3CBC;
+$color-tertiary: #8253D7;
+$color-accent: #D4ADFC;
+
+// Backgrounds
+$bg-light: #f5f6fa;
+$bg-white: #ffffff;
+$bg-dark: #1e1e1e;
+$bg-darker: #2d2d2d;
+
+// Text
+$text-dark: #2d3436;
+$text-medium: #636e72;
+$text-muted-light: #b2bec3;
+$text-muted-dark: #7f8c8d;
+$text-on-primary: #ffffff;
+
+// Status
+$status-success: #00b894;
+$status-error: #d63031;
+
+// UI States
+$hover-dark-bg: #16213e;
+$highlight-light: #CDC1FF;
+
+// Shadows
+$shadow-light: 0 2px 8px rgba(0, 0, 0, 0.1);
+$shadow-medium: 0 2px 8px rgba(0, 0, 0, 0.2);
+$shadow-dark: 0 2px 8px rgba(0, 0, 0, 0.3);]
+
+
+*===>Then after a very long journey we reached here, I ASKED FOR THIS
+Thank you,
+
+These are my current pages and they works well
+---> lib/pages/dashboard_page.dart
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../controllers/product_controller.dart';
+
+class DashboardPage extends StatefulWidget {
+  const DashboardPage({Key? key}) : super(key: key);
+
+  @override
+  State<DashboardPage> createState() => _DashboardPageState();
+}
+
+class _DashboardPageState extends State<DashboardPage> {
+  bool _isDataFetched = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Delay the fetch until after the widget is built
+    Future.microtask(() {
+      final productCubit = context.read<ProductCubit>();
+      if (!_isDataFetched) {
+        productCubit.fetchDashboardStats();
+        _isDataFetched = true;
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ProductCubit, ProductState>(
+      builder: (context, state) {
+        if (state is ProductLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (state is ProductError) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(state.message),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () => context.read<ProductCubit>().fetchDashboardStats(),
+                  child: const Text('Retry'),
+                ),
+              ],
+            ),
+          );
+        }
+
+        if (state is ProductLoaded && state.stats != null) {
+          final lowStockItems = state.products.where((p) => p.quantity <= p.lowStockThreshold).length;
+          final totalItems = state.products.length;
+          final totalValue = state.products.fold(0.0, (sum, p) => (/*sum +*/ (p.basePrice * p.quantity)));
+          return RefreshIndicator(
+            onRefresh: () => context.read<ProductCubit>().fetchDashboardStats(), // Refresh stats
+            // onRefresh: () async {
+            //   await context.read<ProductCubit>().fetchProducts(); // Refresh products list
+            //   await context.read<ProductCubit>().fetchDashboardStats(); // Refresh stats
+            // },
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(), // Ensures scroll even if content is small
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  // Summary Cards
+                  Row(
+                    children: [
+                      // _buildStatCard(context, 'Total Items', '$totalItems', Icons.inventory),
+                      // const SizedBox(width: 10),
+                      // _buildStatCard(context, 'Low Stock', '$lowStockItems', Icons.warning),
+                      // const SizedBox(width: 10),
+                      // _buildStatCard(context, 'Total Value', '\$${totalValue.toStringAsFixed(2)}', Icons.attach_money),
+                      _buildStatCard(
+                        context,
+                        'Total Items',
+                        // state.products.length.toString(),
+                        state.stats?['totalProducts'].toString()??'',
+                        Icons.inventory,
+                      ),
+                      const SizedBox(width: 10),
+                      _buildStatCard(context, 'Low Stock', /* lowStockItems.toString(),*/state.stats?['lowStockItems'].toString()??'', Icons.warning, Colors.orange
+                      ),
+                      const SizedBox(width: 10),
+                      _buildStatCard(context, 'Inventory quantity', '${state.stats?['totalInventory'].toStringAsFixed(0)??''}', Icons.money_outlined,Colors.blue),
+                      const SizedBox(width: 10),
+                      _buildStatCard(context, 'Products Listed', state.products.length.toString(), Icons.list, Colors.teal),
+                    ],
+                  ),
+                  // Wrap(
+                  //   spacing: 10,
+                  //   runSpacing: 10,
+                  //   children: [
+                  //     _buildStatCard(context, 'Total Products', state.stats?['totalProducts'].toString() ?? '', Icons.inventory, Colors.blue),
+                  //     _buildStatCard(context, 'Low Stock', state.stats?['lowStockItems'].toString() ?? '', Icons.warning, Colors.orange),
+                  //     _buildStatCard(context, 'Inventory Qty', state.stats?['totalInventory'].toString() ?? '', Icons.storage, Colors.green),
+                  //     _buildStatCard(context, 'Products Listed', state.products.length.toString(), Icons.list, Colors.teal),
+                  //   ],
+                  // ),
+
+                  const SizedBox(height: 20),
+
+                  const Text('Recent Activities', style: TextStyle(fontSize: 18)),
+                  const SizedBox(height: 10),
+                  ...state.recentMovements.take(5).map((movement) => ListTile(
+                    leading: Icon(movement.movementType == 'in'
+                        ? Icons.arrow_downward
+                        : Icons.arrow_upward),
+                    title: Text(movement.productName),
+                    subtitle: Text('${movement.quantity} items - ${movement.date}'),
+                  )),
+                ],
+              ),
+            ),
+          );
+        }
+
+        return RefreshIndicator(
+          onRefresh: () => context.read<ProductCubit>().fetchDashboardStats(),
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            children: [
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.5,
+                child: const Center(child: Text('Error loading data')),
+              ),
+            ],
+          ),
+        );
+
+      },
+    );
+  }
+
+  // Widget _buildStatCard(BuildContext context, String title, String value, IconData icon) {
+  Widget _buildStatCard(BuildContext context, String title, String value, IconData icon, [Color? iconColor]) {
+    return Expanded(
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(icon, size: 30, color: iconColor ?? Theme.of(context).primaryColor),
+              const SizedBox(height: 10),
+              Text(title, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey[600])),
+              const SizedBox(height: 4),
+              Text(value, style: Theme.of(context).textTheme.headlineMedium),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+// ***************************************************
+
+
+
+
+// // pages/dashboard_page.dart
+// import 'package:flutter/material.dart';
+// import 'package:flutter_bloc/flutter_bloc.dart';
+// import '../controllers/product_controller.dart';
+//
+// class DashboardPage extends StatelessWidget {
+//   const DashboardPage({Key? key}) : super(key: key);
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return BlocBuilder<ProductCubit, ProductState>(
+//       builder: (context, state) {
+//         // Handle loading state
+//         if (state is ProductLoading) {
+//           return const Center(child: CircularProgressIndicator());
+//         }
+//
+//         // Handle error state
+//         if (state is ProductError) {
+//           return Center(
+//             child: Column(
+//               mainAxisAlignment: MainAxisAlignment.center,
+//               children: [
+//                 Text(state.message),
+//                 const SizedBox(height: 16),
+//                 ElevatedButton(
+//                   onPressed: () => context.read<ProductCubit>().fetchDashboardStats(),
+//                   child: const Text('Retry'),
+//                 ),
+//               ],
+//             ),
+//           );
+//         }
+//
+//         // Handle loaded state
+//         if (state is ProductLoaded && state.stats != null) {
+//           final lowStockItems = state.products.where((p) => p.quantity <= p.lowStockThreshold).length;
+//
+//           // final totalItems = state.products.length;
+//           // final totalValue = state.products.fold(0.0, (sum, p) => (/*sum +*/ (p.basePrice * p.quantity)));
+//
+//
+//           return SingleChildScrollView(
+//             padding: const EdgeInsets.all(16),
+//             child: Column(
+//               children: [
+//                 // Summary Cards
+//                 Row(
+//                   children: [
+//                     // _buildStatCard(context, 'Total Items', '$totalItems', Icons.inventory),
+//                     // const SizedBox(width: 10),
+//                     // _buildStatCard(context, 'Low Stock', '$lowStockItems', Icons.warning),
+//                     // const SizedBox(width: 10),
+//                     // _buildStatCard(context, 'Total Value', '\$${totalValue.toStringAsFixed(2)}', Icons.attach_money),
+//                     _buildStatCard(
+//                         context,
+//                         'Total Items',
+//                         state.products.length.toString(),
+//                         Icons.inventory),
+//                     const SizedBox(width: 10),
+//                     _buildStatCard(
+//                         context,
+//                         'Low Stock',
+//                         lowStockItems.toString(),
+//                         Icons.warning),
+//                   ],
+//                 ),
+//                 const SizedBox(height: 20),
+//
+//                 // Recent Activities
+//                 const Text('Recent Activities', style: TextStyle(fontSize: 18)),
+//                 const SizedBox(height: 10),
+//                 ...state.recentMovements.take(5).map((movement) => ListTile(
+//                   leading: Icon(movement.type == 'in'
+//                       ? Icons.arrow_downward
+//                       : Icons.arrow_upward),
+//                   title: Text(movement.productName),
+//                   subtitle: Text('${movement.quantity} items - ${movement.date}'),
+//                 )).toList(),
+//               ],
+//             ),
+//           );
+//         }
+//
+//         // Fallback for unexpected states
+//         return const Center(child: Text('Error loading data'));
+//       },
+//     );
+//   }
+//
+//   Widget _buildStatCard(
+//       BuildContext context, String title, String value, IconData icon) {
+//     return Expanded(
+//       child: Card(
+//         child: Padding(
+//           padding: const EdgeInsets.all(16),
+//           child: Column(
+//             crossAxisAlignment: CrossAxisAlignment.start,
+//             children: [
+//               Icon(icon, size: 30),
+//               const SizedBox(height: 10),
+//               Text(title, style: Theme.of(context).textTheme.bodySmall),
+//               Text(value, style: Theme.of(context).textTheme.displayMedium),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
+// // **************************************
+
+
+
+// // pages/dashboard_page.dart
+// import 'package:flutter/material.dart';
+// import 'package:flutter_bloc/flutter_bloc.dart';
+// import '../controllers/product_controller.dart';
+//
+// class DashboardPage extends StatelessWidget {
+//   const DashboardPage({Key? key}) : super(key: key);
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return BlocBuilder<ProductCubit, ProductState>(
+//       builder: (context, state) {
+//         if (state is ProductLoaded && state.stats != null) {
+//           final lowStockItems = state.products.where((p) => p.quantity <= p.lowStockThreshold).length;
+//
+//           if (state is ProductError) {
+//             return Center(
+//               child: Column(
+//                 mainAxisAlignment: MainAxisAlignment.center,
+//                 children: [
+//                   Text(state.message),
+//                   const SizedBox(height: 16),
+//                   ElevatedButton(
+//                     onPressed: () => context.read<ProductCubit>().fetchDashboardStats(),
+//                     child: const Text('Retry'),
+//                   ),
+//                 ],
+//               ),
+//             );
+//           }
+//
+//           return SingleChildScrollView(
+//             padding: const EdgeInsets.all(16),
+//             child: Column(
+//               children: [
+//                 // Summary Cards
+//                 Row(
+//                   children: [
+//                     _buildStatCard(context, 'Total Items', state.products.length.toString(), Icons.inventory),
+//                     const SizedBox(width: 10),
+//                     _buildStatCard(context, 'Low Stock', lowStockItems.toString(), Icons.warning),
+//                   ],
+//                 ),
+//                 const SizedBox(height: 20),
+//
+//                 // Recent Activities
+//                 const Text('Recent Activities', style: TextStyle(fontSize: 18)),
+//                 const SizedBox(height: 10),
+//                 ...state.recentMovements.take(5).map((movement) =>
+//                     ListTile(
+//                       leading: Icon(movement.type == 'in' ? Icons.arrow_downward : Icons.arrow_upward),
+//                       title: Text(movement.productName),
+//                       subtitle: Text('${movement.quantity} items - ${movement.date}'),
+//                     )
+//                 ).toList(),
+//               ],
+//             ),
+//           );
+//         }
+//         else if (state is ProductLoading) {
+//           return const Center(child: CircularProgressIndicator());
+//         }
+//         return const Center(child: Text('Error loading data'));
+//       },
+//     );
+//   }
+//
+//   Widget _buildStatCard(BuildContext context, String title, String value, IconData icon) {
+//     return Expanded(
+//       child: Card(
+//         child: Padding(
+//           padding: const EdgeInsets.all(16),
+//           child: Column(
+//             crossAxisAlignment: CrossAxisAlignment.start,
+//             children: [
+//               Icon(icon, size: 30),
+//               const SizedBox(height: 10),
+//               Text(title, style: Theme.of(context).textTheme.bodySmall),
+//               Text(value, style: Theme.of(context).textTheme.displayMedium),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+lib/pages/main_navigation.dart
+// pages/main_navigation.dart
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:stock_manager/pages/products_page.dart';
+import 'package:stock_manager/pages/settings_page.dart';
+import '../controllers/theme_controller.dart';
+import 'dashboard_page.dart';
+import 'inventory_page.dart';
+
+class MainNavigation extends StatefulWidget {
+  const MainNavigation({Key? key}) : super(key: key);
+
+  @override
+  State<MainNavigation> createState() => _MainNavigationState();
+}
+
+class _MainNavigationState extends State<MainNavigation> {
+  int _currentIndex = 0;
+
+  final List<Widget> _pages = [
+    const DashboardPage(),
+    const ProductsPage(),
+    const InventoryPage(),
+    const SettingsPage(),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Stock Management'),
+        actions: [
+          IconButton(
+            icon: BlocBuilder<ThemeCubit, ThemeState>(
+              builder: (context, state) {
+                return Icon(state.isDarkMode ? Icons.light_mode : Icons.dark_mode);
+              },
+            ),
+            onPressed: () => context.read<ThemeCubit>().toggleTheme(),
+          ),
+        ],
+      ),
+      body: _pages[_currentIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (index) => setState(() => _currentIndex = index),
+        selectedItemColor: Theme.of(context).colorScheme.secondary,
+        unselectedItemColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.inventory), label: 'Products'),
+          BottomNavigationBarItem(icon: Icon(Icons.assessment), label: 'Inventory'),
+          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => Navigator.pushNamed(context, '/add-product'),
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+}
+
+
+
+lib/pages/login_screen.dart
+// lib/pages/login_screen.dart
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../controllers/auth_controller.dart';
+
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({Key? key}) : super(key: key);
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
+  bool _isLoading = false;
+  bool _obscurePassword = true;
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: BlocListener<AuthCubit, AuthState>(
+        listener: (context, state) {
+          if (state is AuthAuthenticated) {
+            Navigator.pushReplacementNamed(context, '/home');
+          } else if (state is AuthError) {
+            setState(() => _isLoading = false);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.message)),
+            );
+          }
+        },
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const FlutterLogo(size: 100),
+                  const SizedBox(height: 40),
+                  TextFormField(
+                    controller: _usernameController,
+                    decoration: const InputDecoration(
+                      labelText: 'Username',
+                      prefixIcon: Icon(Icons.person),
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your username';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  // TextFormField(
+                  //   controller: _passwordController,
+                  //   obscureText: true,
+                  //   decoration: const InputDecoration(
+                  //     labelText: 'Password',
+                  //     prefixIcon: Icon(Icons.lock),
+                  //     border: OutlineInputBorder(),
+                  //   ),
+                  //   validator: (value) {
+                  //     if (value == null || value.isEmpty) {
+                  //       return 'Please enter your password';
+                  //     }
+                  //     return null;
+                  //   },
+                  // ),
+                  TextFormField(
+                    controller: _passwordController,
+                    obscureText: _obscurePassword,
+                    decoration: InputDecoration(
+                      labelText: 'Password',
+                      prefixIcon: const Icon(Icons.lock),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscurePassword
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _obscurePassword = !_obscurePassword;
+                          });
+                        },
+                      ),
+                      border: const OutlineInputBorder(),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your password';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: _isLoading ? null : _submitForm,
+                      child: _isLoading
+                          ? const CircularProgressIndicator()
+                          : const Text('LOGIN'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _submitForm() {
+    if (_formKey.currentState!.validate()) {
+      setState(() => _isLoading = true);
+      context.read<AuthCubit>().login(
+        _usernameController.text.trim(),
+        _passwordController.text.trim(),
+      );
+    }
+  }
+}
+
+
+
+lib/pages/products_page.dart
+// lib/pages/products_page.dart
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:stock_manager/config/env.dart';
+import 'package:stock_manager/models/product.dart';
+import '../controllers/product_controller.dart';
+import 'product_details.dart';
+
+class ProductsPage extends StatefulWidget {
+  const ProductsPage({Key? key}) : super(key: key);
+
+  @override
+  State<ProductsPage> createState() => _ProductsPageState();
+}
+
+class _ProductsPageState extends State<ProductsPage> {
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ProductCubit, ProductState>(
+      builder: (context, state) {
+        List<Product> displayedProducts = [];
+        if (state is ProductLoaded) {
+          displayedProducts = state.products.where((product) {
+            return _searchQuery.isEmpty ||
+                product.name.toLowerCase().contains(_searchQuery.toLowerCase());
+          }).toList();
+        }
+
+        return Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  hintText: 'Search products...',
+                  prefixIcon: const Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    _searchQuery = value;
+                  });
+                },
+              ),
+            ),
+            Expanded(
+              child: _buildProductList(context, state, displayedProducts),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildProductList(
+      BuildContext context, ProductState state, List<Product> products) {
+    if (state is ProductLoading) {
+      return const Center(child: CircularProgressIndicator());
+    } else if (state is ProductLoaded) {
+      return RefreshIndicator(
+        onRefresh: () => context.read<ProductCubit>().fetchProducts(),
+        child: ListView.builder(
+          itemCount: products.length,
+          itemBuilder: (context, index) {
+            final product = products[index];
+            return Card(
+              margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+              child: ListTile(
+                leading: product.imageUrl != null
+                    ? Image.network(
+                  '${Env.mediaUrl}${product.imageUrl!}',
+                  width: 50,
+                  height: 50,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) =>
+                  const Icon(Icons.image),
+                )
+                    : const Icon(Icons.image),
+                title: Text(product.name),
+                subtitle: Text('Stock: ${product.quantity}'),
+                trailing: product.quantity <= product.lowStockThreshold
+                    ? const Icon(Icons.warning, color: Colors.orange)
+                    : null,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ProductDetailsPage(product: product),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      );
+    } else if (state is ProductError) {
+      return Center(child: Text(state.message));
+    }
+    return const Center(child: Text('Unknown state'));
+  }
+}
+
+
+
+// // pages/products_page.dart
+// import 'package:flutter/material.dart';
+// import 'package:flutter_bloc/flutter_bloc.dart';
+// import 'package:stock_manager/config/env.dart';
+// import '../controllers/product_controller.dart';
+// import 'product_details.dart';
+//
+// class ProductsPage extends StatelessWidget {
+//   const ProductsPage({Key? key}) : super(key: key);
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return BlocBuilder<ProductCubit, ProductState>(
+//       builder: (context, state) {
+//         if (state is ProductLoading) {
+//           return const Center(child: CircularProgressIndicator());
+//         } else if (state is ProductLoaded) {
+//           return RefreshIndicator(
+//             onRefresh: () => context.read<ProductCubit>().fetchProducts(),
+//             child: ListView.builder(
+//               itemCount: state.products.length,
+//               itemBuilder: (context, index) {
+//                 final product = state.products[index];
+//                 return Card(
+//                   margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+//                   child: ListTile(
+//                     leading: product.imageUrl != null
+//                         ? Image.network(
+//                       '${Env.mediaUrl}${product.imageUrl!}',
+//                       width: 50,
+//                       height: 50,
+//                       fit: BoxFit.cover,
+//                       errorBuilder: (context, error, stackTrace) =>
+//                       const Icon(Icons.image),
+//                     )
+//                         : const Icon(Icons.image),
+//                     title: Text(product.name),
+//                     subtitle: Text('Stock: ${product.quantity}'),
+//                     trailing: product.quantity <= product.lowStockThreshold
+//                         ? const Icon(Icons.warning, color: Colors.orange)
+//                         : null,
+//                     onTap: () => Navigator.push(
+//                       context,
+//                       MaterialPageRoute(
+//                         builder: (_) => ProductDetailsPage(product: product),
+//                       ),
+//                     ),
+//                   ),
+//                 );
+//               },
+//             ),
+//           );
+//         } else if (state is ProductError) {
+//           return Center(child: Text(state.message));
+//         }
+//         return const Center(child: Text('Unknown state'));
+//       },
+//     );
+//   }
+// }
+
+
+
+lib/pages/product_details.dart
+// pages/product_details.dart
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:stock_manager/config/env.dart';
+import 'package:stock_manager/controllers/auth_controller.dart';
+import 'package:stock_manager/controllers/stock_controller.dart';
+import '../controllers/product_controller.dart';
+import '../models/product.dart';
+import '../models/stock_movement.dart';
+
+class ProductDetailsPage extends StatefulWidget {
+  final Product product;
+
+  const ProductDetailsPage({required this.product, Key? key}) : super(key: key);
+
+  @override
+  State<ProductDetailsPage> createState() => _ProductDetailsPageState();
+}
+
+class _ProductDetailsPageState extends State<ProductDetailsPage> {
+  final _quantityController = TextEditingController();
+  String _movementType = 'in';
+
+  @override
+  void initState() {
+    super.initState();
+    _quantityController.text = '1';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text(widget.product.name)),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Current Stock: ${widget.product.quantity}',
+                style: Theme.of(context).textTheme.headlineSmall),
+            if (widget.product.quantity <= widget.product.lowStockThreshold)
+              Text('LOW STOCK WARNING',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyLarge
+                      ?.copyWith(color: Colors.red)),
+            const SizedBox(height: 20),
+            Text('Base Price: \$${widget.product.basePrice.toStringAsFixed(2)}'),
+            if (widget.product.description != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Text(widget.product.description!),
+              ),
+            const Divider(height: 20),
+            if (widget.product.imageUrl != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 16, bottom: 16),
+                child: Image.network(
+                  '${Env.mediaUrl}${widget.product.imageUrl!}',
+                  height: 200,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) =>
+                  const Icon(Icons.broken_image, size: 100),
+                ),
+              ),
+            const Divider(height: 40),
+            const Text('Stock Movement',
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            DropdownButton<String>(
+              value: _movementType,
+              items: const [
+                DropdownMenuItem(value: 'in', child: Text('Stock In')),
+                DropdownMenuItem(value: 'out', child: Text('Stock Out')),
+              ],
+              onChanged: (value) => setState(() => _movementType = value!),
+            ),
+            TextField(
+              controller: _quantityController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(labelText: 'Quantity'),
+            ),
+            ElevatedButton(
+              onPressed: _submitMovement,
+              child: const Text('Record Movement'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _submitMovement() {
+    final quantity = int.tryParse(_quantityController.text) ?? 0;
+    if (quantity <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please enter a valid quantity')));
+      return;
+    }
+
+    // Validate stock out doesn't exceed available quantity
+    if (_movementType == 'out' && quantity > widget.product.quantity) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Insufficient stock')));
+      return;
+    }
+
+    final movement = StockMovement(
+      id: DateTime.now().millisecondsSinceEpoch,
+      productId: widget.product.id,
+      movementType: _movementType,
+      quantity: quantity,
+      // userId: context.read<AuthCubit>().state.user?.id ?? 1,
+      userId: context.read<AuthCubit>().state.userData?['id'] ?? 1,
+      movementDate: DateTime.now(),
+      productName: widget.product.name,
+      reference: _movementType == 'out' ? 'Sale' : 'Restock',
+    );
+
+    context.read<StockCubit>().recordMovement(movement);
+    context.read<ProductCubit>().fetchProducts(); // Refresh product list
+    Navigator.pop(context);
+  }
+
+  @override
+  void dispose() {
+    _quantityController.dispose();
+    super.dispose();
+  }
+}
+
+
+
+lib/pages/product_form.dart
+// lib/pages/product_form.dart
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import '../controllers/product_controller.dart';
+
+class ProductForm extends StatefulWidget {
+  const ProductForm({Key? key}) : super(key: key);
+
+  @override
+  State<ProductForm> createState() => _ProductFormState();
+}
+
+class _ProductFormState extends State<ProductForm> {
+  final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  final _priceController = TextEditingController();
+  final _quantityController = TextEditingController();
+  final _descController = TextEditingController();
+  File? _imageFile;
+  final _picker = ImagePicker();
+  bool _isUploading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Add Product'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.save),
+            onPressed: _isUploading ? null : _submitForm,
+          ),
+        ],
+      ),
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Form(
+              key: _formKey,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    _buildImagePicker(),
+                    const SizedBox(height: 20),
+                    TextFormField(
+                      controller: _nameController,
+                      decoration: const InputDecoration(
+                        labelText: 'Product Name',
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) => value!.isEmpty ? 'Required' : null,
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _priceController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        labelText: 'Price',
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) => value!.isEmpty ? 'Required' : null,
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _quantityController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        labelText: 'Initial Quantity',
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) => value!.isEmpty ? 'Required' : null,
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _descController,
+                      maxLines: 3,
+                      decoration: const InputDecoration(
+                        labelText: 'Description',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: _isUploading ? null : _submitForm,
+                      child: const Text('Save Product'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          if (_isUploading)
+            const Center(child: CircularProgressIndicator()),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildImagePicker() {
+    return GestureDetector(
+      onTap: _pickImage,
+      child: Container(
+        height: 200,
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: _imageFile != null
+            ? ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: Image.file(_imageFile!, fit: BoxFit.cover),
+        )
+            : Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: const [
+            Icon(Icons.add_a_photo, size: 50),
+            SizedBox(height: 8),
+            Text('Add Product Image'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _pickImage() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = File(pickedFile.path);
+      });
+    }
+  }
+
+  Future<void> _submitForm() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isUploading = true);
+
+    try {
+      final productData = {
+        'name': _nameController.text,
+        'base_price': double.parse(_priceController.text),
+        'quantity': int.parse(_quantityController.text),
+        'description': _descController.text,
+        'product_type_id':1,
+        'category_id':1,
+        'attributes':[
+          {'attribute_id':1,'value':'Blue'},
+          {'attribute_id':2,'value':'64'},
+          {'attribute_id':7,'value':10},
+          {'attribute_id':9,'value':7},
+        ]
+      };
+
+      final productCubit = context.read<ProductCubit>();
+      final product = await productCubit.addProduct(productData);
+
+        print('PRODUCT: ${product.id}');
+      if (_imageFile != null && product.id != null) {
+        await productCubit.uploadProductImage(product.id!, _imageFile!);
+      }
+
+      if (mounted) Navigator.pop(context);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${e.toString()}')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isUploading = false);
+    }
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _priceController.dispose();
+    _quantityController.dispose();
+    _descController.dispose();
+    super.dispose();
+  }
+}
+
+
+
+lib/pages/inventory_page.dart
+// pages/inventory_page.dart
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../controllers/product_controller.dart';
+
+class InventoryPage extends StatelessWidget {
+  const InventoryPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ProductCubit, ProductState>(
+      builder: (context, state) {
+        if (state is ProductLoading) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (state is ProductLoaded) {
+          final lowStockItems = state.products
+              .where((p) => p.quantity <= p.lowStockThreshold)
+              .toList();
+          // print("INVENTORY: ${state.products}, ${state.products[4].name}, ${state.products[4].quantity}, ${state.products[4].lowStockThreshold}");
+          return ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              const Text('Low Stock Items',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 10),
+              if (lowStockItems.isEmpty)
+                const Card(child: Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Text('No low stock items'),
+                ))
+              else
+                ...lowStockItems.map((product) => Card(
+                  child: ListTile(
+                    title: Text(product.name),
+                    subtitle: Text('Stock: ${product.quantity}'),
+                    trailing: const Icon(Icons.warning, color: Colors.orange),
+                  ),
+                )),
+            ],
+          );
+        }
+        return const Center(child: Text('Error loading inventory'));
+      },
+    );
+  }
+}
+
+
+
+lib/pages/settings_page.dart
+// pages/settings_page.dart
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:stock_manager/config/env.dart';
+import 'package:stock_manager/controllers/auth_controller.dart';
+import 'package:stock_manager/utils/database_helper.dart';
+import 'package:stock_manager/utils/sync_service.dart';
+import '../controllers/language_controller.dart';
+import '../controllers/theme_controller.dart';
+
+class SettingsPage extends StatelessWidget {
+  const SettingsPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(localizations?.language ?? 'Language',
+                    style: Theme.of(context).textTheme.titleMedium),
+                const SizedBox(height: 8),
+                BlocBuilder<LanguageCubit, LanguageState>(
+                  builder: (context, state) {
+                    return DropdownButton<String>(
+                      value: state.locale.languageCode,
+                      items: const [
+                        DropdownMenuItem(value: 'en', child: Text('English')),
+                        DropdownMenuItem(value: 'es', child: Text('Spanish')),
+                        DropdownMenuItem(value: 'fr', child: Text('French')),
+                        DropdownMenuItem(value: 'sw', child: Text('Swahili')),
+                      ],
+                      onChanged: (value) {
+                        if (value != null) {
+                          context.read<LanguageCubit>().changeLanguage(value);
+                        }
+                      },
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(localizations?.theme ?? 'Theme',
+                    style: Theme.of(context).textTheme.titleMedium),
+                const SizedBox(height: 8),
+                BlocBuilder<ThemeCubit, ThemeState>(
+                  builder: (context, state) {
+                    return SwitchListTile(
+                      title: Text(state.isDarkMode
+                          ? localizations?.darkMode ?? 'Dark Mode'
+                          : localizations?.lightMode ?? 'Light Mode'),
+                      value: state.isDarkMode,
+                      onChanged: (_) => context.read<ThemeCubit>().toggleTheme(),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Data Synchronization',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                ElevatedButton(
+                  onPressed: () async {
+                    await SyncService(
+                      dbHelper: DatabaseHelper.instance,
+                      apiUrl: Env.baseUrl,
+                    ).syncAllData(context);
+
+                  },
+                  child: const Text('Sync Data Now'),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Leaving',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        context.read<AuthCubit>().logout();
+                        Navigator.pushNamedAndRemoveUntil(
+                          context,
+                          '/',
+                              (route) => false,
+                        );
+                      },
+                      child: Text('Logout'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// class SettingsPage extends StatelessWidget {
+//   const SettingsPage({Key? key}) : super(key: key);
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return ListView(
+//       padding: const EdgeInsets.all(16),
+//       children: [
+//         Card(
+//           child: Padding(
+//             padding: const EdgeInsets.all(16),
+//             child: Column(
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               children: [
+//                 Text(AppLocalizations.of(context)!.language,
+//                     style: Theme.of(context).textTheme.titleMedium),
+//                 const SizedBox(height: 8),
+//                 BlocBuilder<LanguageCubit, LanguageState>(
+//                   builder: (context, state) {
+//                     return DropdownButton<String>(
+//                       value: state.locale.languageCode,
+//                       items: const [
+//                         DropdownMenuItem(value: 'en', child: Text('English')),
+//                         DropdownMenuItem(value: 'es', child: Text('Spanish')),
+//                         DropdownMenuItem(value: 'fr', child: Text('French')),
+//                         DropdownMenuItem(value: 'sw', child: Text('Swahili')),
+//                       ],
+//                       onChanged: (value) {
+//                         if (value != null) {
+//                           context.read<LanguageCubit>().changeLanguage(value);
+//                         }
+//                       },
+//                     );
+//                   },
+//                 ),
+//               ],
+//             ),
+//           ),
+//         ),
+//         Card(
+//           child: Padding(
+//             padding: const EdgeInsets.all(16),
+//             child: Column(
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               children: [
+//                 Text(AppLocalizations.of(context)!.theme,
+//                     style: Theme.of(context).textTheme.titleMedium),
+//                 const SizedBox(height: 8),
+//                 BlocBuilder<ThemeCubit, ThemeState>(
+//                   builder: (context, state) {
+//                     return SwitchListTile(
+//                       title: Text(state.isDarkMode
+//                           ? AppLocalizations.of(context)!.darkMode
+//                           : AppLocalizations.of(context)!.lightMode),
+//                       value: state.isDarkMode,
+//                       onChanged: (_) =>
+//                           context.read<ThemeCubit>().toggleTheme(),
+//                     );
+//                   },
+//                 ),
+//               ],
+//             ),
+//           ),
+//         ),
+//       ],
+//     );
+//   }
+// }
+
+--->Now i want to add mode cool, professional appealing widget charts and card with cool colors for statistics e.t.c
+
+--->Also please make the [ login, products screen, product-details,produc-form, inventory screen, settings screen, bottom navigation and the whole MainNavigation ] more appealing and futuristic feel free to improve anything to achieve eye catching futuristic utopia level appearance and arrangement of components
+
+
+
+
+
+PLEASE WAIT WHILE I GIVE YOU MORE DETAILS DON'T DO ANYTHING NOW

@@ -18,13 +18,15 @@ class ProductCubit extends Cubit<ProductState> {
   static String get baseUrl => Env.baseUrl;
 
   ProductCubit(this.dbHelper) : super(ProductLoading()) {
-    loadProducts();
+    loadProducts(); // Quick local load
+    Future.microtask(() => fetchProducts()); // Remote override
   }
 
   Future<void> loadProducts() async {
     emit(ProductLoading());
     try {
       final products = await dbHelper.getProducts();
+      print("PRODUCTS: ${products}");
       emit(ProductLoaded(products: products));
     } catch (e) {
       emit(ProductError(e.toString()));
@@ -60,7 +62,7 @@ class ProductCubit extends Cubit<ProductState> {
   //     emit(ProductError('Failed to load stats: ${e.toString()}'));
   //   }
   // }
-  // Update fetchDashboardStats to use proper state
+
   Future<void> fetchDashboardStats() async {
     try {
       final token = await AuthHelper.getToken();
@@ -72,13 +74,17 @@ class ProductCubit extends Cubit<ProductState> {
       );
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        print('DATA: ${data}');
         final stats = data['stats'];
+        final recent = (data['recentMovements'] as List)
+            .map((json) => StockMovement.fromJson(json))
+            .toList();
+
         emit(ProductLoaded(
-          products: (state is ProductLoaded) ? (state as ProductLoaded).products : [],
+          products: state is ProductLoaded ? (state as ProductLoaded).products : [],
           stats: stats,
-          recentMovements: (state is ProductLoaded) ? (state as ProductLoaded).recentMovements : [],
+          recentMovements: recent,
         ));
+
 
         // final data = json.decode(response.body);
         // if (state is ProductLoaded) {
@@ -169,33 +175,31 @@ class ProductCubit extends Cubit<ProductState> {
 
 
   Future<void> fetchProducts() async {
-    print('REFRESH');
     try {
       final token = await AuthHelper.getToken();
-      final response = await http.get(Uri.parse('$baseUrl/products'),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-      );
-      print('REFRESH 2 ${response.statusCode}');
+      final response = await http.get(Uri.parse('$baseUrl/products'), headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      });
+
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         final products = data.map((json) => Product.fromJson(json)).toList();
-        // final List<dynamic> data = json.decode(response.body);
-        // final products = data
-        //     .where((item) => item['dataValues'] != null)
-        //     .map((item) => Product.fromJson(item['dataValues']))
-        //     .toList();
 
-        print('FETCH 01: ${products.length.toString()}');
-        print('FETCH: ${data.toString()}');
-        emit(ProductLoaded(products: products));
+        emit(ProductLoaded(
+          products: products,
+          stats: state is ProductLoaded ? (state as ProductLoaded).stats : null,
+          recentMovements: state is ProductLoaded ? (state as ProductLoaded).recentMovements : [],
+        ));
       }
     } catch (e) {
-      emit(ProductError('Failed to load products: ${e.toString()}'));
+      // Don't override the UI with an error if it already has data
+      if (state is! ProductLoaded) {
+        emit(ProductError('Failed to load products: ${e.toString()}'));
+      }
     }
   }
+
 
 }
 
@@ -204,7 +208,10 @@ abstract class ProductState {
   List<Product> get products => []; // Add base getter
 }
 
-class ProductLoading extends ProductState {}
+class ProductLoading extends ProductState {
+  @override
+  List<Product> get products => [];
+}
 
 class ProductLoaded extends ProductState {
   final List<Product> products;

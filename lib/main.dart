@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stock_manager/config/env.dart';
 import 'package:stock_manager/controllers/stock_controller.dart';
+import 'package:stock_manager/utils/auth_helper.dart';
 import 'package:stock_manager/utils/socket_service.dart';
 import 'config/routes.dart';
 import 'config/theme.dart';
@@ -23,19 +24,33 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Env.init();
 
-  // Initialize shared preferences and database
   final prefs = await SharedPreferences.getInstance();
   final dbHelper = DatabaseHelper.instance;
   await dbHelper.database;
 
-  runApp(MyApp(prefs: prefs, dbHelper: dbHelper));
+  // Check if token exists
+  final token = await AuthHelper.getToken();//prefs.getString('auth_token');
+  final isLoggedIn = token != null && token.isNotEmpty;
+
+  runApp(MyApp(
+    prefs: prefs,
+    dbHelper: dbHelper,
+    isLoggedIn: isLoggedIn,
+  ));
 }
+
 
 class MyApp extends StatelessWidget {
   final SharedPreferences prefs;
   final DatabaseHelper dbHelper;
+  final bool isLoggedIn;
 
-  const MyApp({required this.prefs, required this.dbHelper, Key? key}) : super(key: key);
+  const MyApp({
+    required this.prefs,
+    required this.dbHelper,
+    required this.isLoggedIn,
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +70,7 @@ class MyApp extends StatelessWidget {
               return MaterialApp(
                 title: 'Stock Management',
                 theme: themeState.isDarkMode ? darkTheme : lightTheme,
-                initialRoute: '/',
+                initialRoute: isLoggedIn ? '/home' : '/', // 👈 Choose route based on login state
                 onGenerateRoute: AppRoutes.generateRoute,
                 supportedLocales: AppLocalizations.supportedLocales,
                 locale: languageState.locale,

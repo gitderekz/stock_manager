@@ -1,0 +1,169 @@
+INSERT INTO users (username, password_hash, full_name, email, role, is_active, last_login) VALUES
+('admin1', '$2a$10$N9qo8uLOickgx2ZMRZoMy.MQRqQzY6nXzY2X7qZ9JN6Yt0XJQ1FqK', 'Admin One', 'admin1@example.com', 'admin', TRUE, '2023-01-01 09:00:00'),
+('manager1', '$2a$10$N9qo8uLOickgx2ZMRZoMy.MQRqQzY6nXzY2X7qZ9JN6Yt0XJQ1FqK', 'Manager One', 'manager1@example.com', 'manager', TRUE, '2023-01-02 10:00:00'),
+('staff1', '$2a$10$N9qo8uLOickgx2ZMRZoMy.MQRqQzY6nXzY2X7qZ9JN6Yt0XJQ1FqK', 'Staff One', 'staff1@example.com', 'staff', TRUE, '2023-01-03 11:00:00'),
+('staff2', '$2a$10$N9qo8uLOickgx2ZMRZoMy.MQRqQzY6nXzY2X7qZ9JN6Yt0XJQ1FqK', 'Staff Two', 'staff2@example.com', 'staff', TRUE, '2023-01-04 12:00:00'),
+('manager2', '$2a$10$N9qo8uLOickgx2ZMRZoMy.MQRqQzY6nXzY2X7qZ9JN6Yt0XJQ1FqK', 'Manager Two', 'manager2@example.com', 'manager', TRUE, '2023-01-05 13:00:00'),
+('admin2', '$2a$10$N9qo8uLOickgx2ZMRZoMy.MQRqQzY6nXzY2X7qZ9JN6Yt0XJQ1FqK', 'Admin Two', 'admin2@example.com', 'admin', TRUE, '2023-01-06 14:00:00'),
+('staff3', '$2a$10$N9qo8uLOickgx2ZMRZoMy.MQRqQzY6nXzY2X7qZ9JN6Yt0XJQ1FqK', 'Staff Three', 'staff3@example.com', 'staff', FALSE, '2023-01-07 15:00:00'),
+('staff4', '$2a$10$N9qo8uLOickgx2ZMRZoMy.MQRqQzY6nXzY2X7qZ9JN6Yt0XJQ1FqK', 'Staff Four', 'staff4@example.com', 'staff', TRUE, '2023-01-08 16:00:00'),
+('manager3', '$2a$10$N9qo8uLOickgx2ZMRZoMy.MQRqQzY6nXzY2X7qZ9JN6Yt0XJQ1FqK', 'Manager Three', 'manager3@example.com', 'manager', TRUE, '2023-01-09 17:00:00'),
+('staff5', '$2a$10$N9qo8uLOickgx2ZMRZoMy.MQRqQzY6nXzY2X7qZ9JN6Yt0XJQ1FqK', 'Staff Five', 'staff5@example.com', 'staff', TRUE, '2023-01-10 18:00:00');
+
+
+INSERT INTO categories (name, description, parent_id) VALUES
+('Electronics', 'Electronic devices and components', NULL),
+('Mobile Phones', 'Smartphones and feature phones', 1),
+('Laptops', 'Portable computers', 1),
+('Clothing', 'Apparel and accessories', NULL),
+('Men''s Clothing', 'Clothing for men', 4),
+('Women''s Clothing', 'Clothing for women', 4),
+('Accessories', 'Fashion accessories', NULL),
+('Jewelry', 'Fine and costume jewelry', 7),
+('Home & Garden', 'Home improvement and gardening', NULL),
+('Furniture', 'Home and office furniture', 9);
+
+
+INSERT INTO product_types (name, category_id) VALUES
+('Smartphone', 2),
+('Feature Phone', 2),
+('Gaming Laptop', 3),
+('Ultrabook', 3),
+('T-Shirt', 5),
+('Jeans', 5),
+('Dress', 6),
+('Necklace', 8),
+('Sofa', 10),
+('Dining Table', 10);
+
+
+INSERT INTO attributes (name, data_type, product_type_id, is_required) VALUES
+('Color', 'dropdown', 1, TRUE),
+('Storage', 'dropdown', 1, TRUE),
+('RAM', 'dropdown', 1, TRUE),
+('Screen Size', 'number', 1, TRUE),
+('Processor', 'text', 3, TRUE),
+('Graphics Card', 'text', 3, TRUE),
+('Size', 'dropdown', 5, TRUE),
+('Material', 'text', 5, FALSE),
+('Length', 'number', 7, FALSE),
+('Gemstone', 'text', 8, FALSE);
+
+
+INSERT INTO attribute_options (attribute_id, value) VALUES
+(1, 'Black'),
+(1, 'White'),
+(1, 'Blue'),
+(2, '64GB'),
+(2, '128GB'),
+(2, '256GB'),
+(3, '4GB'),
+(3, '6GB'),
+(3, '8GB'),
+(4, '6.1');
+
+
+INSERT INTO products (name, product_type_id, category_id, base_price, description) VALUES
+('iPhone 14', 1, 2, 999.99, 'Latest Apple smartphone'),
+('Samsung Galaxy S23', 1, 2, 899.99, 'Flagship Android phone'),
+('Nokia 3310', 2, 2, 49.99, 'Classic durable phone'),
+('Alienware m15', 3, 3, 1999.99, 'Powerful gaming laptop'),
+('MacBook Air', 4, 3, 999.99, 'Lightweight ultrabook'),
+('Cotton T-Shirt', 5, 5, 19.99, 'Comfortable cotton shirt'),
+('Slim Fit Jeans', 6, 5, 49.99, 'Modern slim fit jeans'),
+('Summer Dress', 7, 6, 59.99, 'Light summer dress'),
+('Diamond Necklace', 8, 8, 999.99, 'Elegant diamond jewelry'),
+('Leather Sofa', 9, 10, 799.99, 'Comfortable living room sofa');
+
+
+INSERT INTO product_attributes (product_id, attribute_id, value) VALUES
+(1, 1, 'Black'),
+(1, 2, '128GB'),
+(1, 3, '6GB'),
+(1, 4, '6.1'),
+(2, 1, 'White'),
+(2, 2, '256GB'),
+(2, 3, '8GB'),
+(2, 4, '6.4'),
+(5, 7, 'M'),
+(6, 7, '32');
+
+
+INSERT INTO product_attributes (product_id, attribute_id, value) VALUES
+(1, 1, 'Black'),
+(1, 2, '128GB'),
+(1, 3, '6GB'),
+(1, 4, '6.1'),
+(2, 1, 'White'),
+(2, 2, '256GB'),
+(2, 3, '8GB'),
+(2, 4, '6.4'),
+(5, 7, 'M'),
+(6, 7, '32');
+
+
+INSERT INTO inventory (product_id, quantity, low_stock_threshold) VALUES
+(1, 50, 5),
+(2, 30, 5),
+(3, 100, 10),
+(4, 10, 2),
+(5, 25, 5),
+(6, 200, 20),
+(7, 150, 15),
+(8, 75, 10),
+(9, 5, 1),
+(10, 15, 3);
+
+
+INSERT INTO stock_movements (product_id, movement_type, quantity, reference, notes, user_id) VALUES
+(1, 'in', 100, 'PO-1001', 'Initial stock', 1),
+(1, 'out', 50, 'SO-2001', 'Sold to customer', 3),
+(2, 'in', 50, 'PO-1002', 'Initial stock', 1),
+(2, 'out', 20, 'SO-2002', 'Sold to customer', 4),
+(3, 'in', 200, 'PO-1003', 'Initial stock', 1),
+(4, 'in', 15, 'PO-1004', 'Initial stock', 1),
+(4, 'out', 5, 'SO-2003', 'Sold to customer', 5),
+(5, 'in', 30, 'PO-1005', 'Initial stock', 1),
+(6, 'in', 250, 'PO-1006', 'Initial stock', 1),
+(6, 'out', 50, 'SO-2004', 'Sold to customer', 6);
+
+
+INSERT INTO sync_queue (table_name, record_id, operation, data, is_synced) VALUES
+('products', 11, 'create', '{"name":"New Product","product_type_id":1,"category_id":2,"base_price":599.99}', FALSE),
+('products', 1, 'update', '{"base_price":1099.99}', FALSE),
+('inventory', 1, 'update', '{"quantity":45}', FALSE),
+('products', 5, 'update', '{"description":"Updated description"}', FALSE),
+('stock_movements', 11, 'create', '{"product_id":1,"movement_type":"in","quantity":10}', FALSE),
+('products', 2, 'update', '{"is_active":false}', FALSE),
+('inventory', 3, 'update', '{"low_stock_threshold":15}', FALSE),
+('products', 7, 'update', '{"base_price":54.99}', FALSE),
+('stock_movements', 12, 'create', '{"product_id":3,"movement_type":"out","quantity":5}', FALSE),
+('products', 10, 'update', '{"name":"Premium Leather Sofa"}', FALSE);
+
+
+INSERT INTO settings (setting_key, setting_value) VALUES
+('company_name', 'Stock Manager Inc.'),
+('default_currency', 'USD'),
+('low_stock_alert', 'true'),
+('sync_interval', '300'),
+('theme', 'light'),
+('language', 'en'),
+('notification_enabled', 'true'),
+('offline_mode', 'false'),
+('backup_schedule', 'daily'),
+('tax_rate', '7.5');
+
+
+INSERT INTO notifications (user_id, title, message, notification_type, is_read) VALUES
+(1, 'Low Stock Alert', 'iPhone 14 is running low (5 remaining)', 'stock_alert', FALSE),
+(2, 'System Update', 'New version available (v2.0)', 'system', TRUE),
+(3, 'Order Shipped', 'Your order #1001 has been shipped', 'other', FALSE),
+(1, 'Sync Completed', 'Data sync completed successfully', 'system', TRUE),
+(2, 'Low Stock Alert', 'Samsung Galaxy S23 is running low (3 remaining)', 'stock_alert', FALSE),
+(4, 'New Message', 'You have a new message from support', 'other', FALSE),
+(1, 'Backup Completed', 'Database backup completed', 'system', TRUE),
+(3, 'Low Stock Alert', 'Nokia 3310 is running low (8 remaining)', 'stock_alert', FALSE),
+(5, 'Task Reminder', 'Complete inventory check by EOD', 'other', FALSE),
+(1, 'New User', 'New staff account created', 'system', TRUE);
+
+
