@@ -50,6 +50,8 @@ class _DashboardPageState extends State<DashboardPage> {
                 children: [
                   _buildStatsGrid(context, state),
                   const SizedBox(height: 24),
+                  _buildSalesStats(context, state.stats!),
+                  const SizedBox(height: 24),
                   _buildStockChart(state),
                   const SizedBox(height: 24),
                   _buildRecentActivities(state),
@@ -195,6 +197,132 @@ class _DashboardPageState extends State<DashboardPage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+
+  Widget _buildSalesStats(BuildContext context, Map<String, dynamic> stats) {
+    final sales = stats['sales'] ?? {
+      'today': {'quantity': 0, 'value': 0},
+      'weekly': {'quantity': 0, 'value': 0},
+      'monthly': {'quantity': 0, 'value': 0},
+      'yearly': {'quantity': 0, 'value': 0},
+    };
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        color: Theme.of(context).colorScheme.surface,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Sales Analytics',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: _buildMiniStatCard(
+                  context,
+                  'Today',
+                  '${sales['today']['quantity']}',
+                  '\$${sales['today']['value'].toStringAsFixed(2)}',
+                  const Color(0xFF6A3CBC),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildMiniStatCard(
+                  context,
+                  'This Week',
+                  '${sales['weekly']['quantity']}',
+                  '\$${sales['weekly']['value'].toStringAsFixed(2)}',
+                  const Color(0xFF4CAF50),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _buildMiniStatCard(
+                  context,
+                  'This Month',
+                  '${sales['monthly']['quantity']}',
+                  '\$${sales['monthly']['value'].toStringAsFixed(2)}',
+                  const Color(0xFF2196F3),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildMiniStatCard(
+                  context,
+                  'This Year',
+                  '${sales['yearly']['quantity']}',
+                  '\$${sales['yearly']['value'].toStringAsFixed(2)}',
+                  const Color(0xFFFF7043),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMiniStatCard(
+      BuildContext context, String title, String quantity, String value, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        color: color.withOpacity(0.1),
+        border: Border.all(
+          color: color.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            quantity,
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            value,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: color,
+            ),
+          ),
+        ],
       ),
     );
   }

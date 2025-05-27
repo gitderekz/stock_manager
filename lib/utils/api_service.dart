@@ -6,16 +6,22 @@ import 'package:stock_manager/config/env.dart';
 import 'auth_helper.dart';
 
 class ApiService {
-  static Future<http.Response> get(String endpoint) async {
+
+  static Future<http.Response> get(String endpoint, {Map<String, String>? params}) async {
     final token = await AuthHelper.getToken();
+
+    // Append query parameters if provided
+    final uri = Uri.parse('${Env.baseUrl}/$endpoint').replace(queryParameters: params);
+
     return await http.get(
-      Uri.parse('${Env.baseUrl}/$endpoint'),
+      uri,
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
       },
     );
   }
+
 
   static Future<http.Response> post(String endpoint, dynamic body) async {
     final token = await AuthHelper.getToken();
