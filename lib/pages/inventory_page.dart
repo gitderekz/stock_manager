@@ -17,7 +17,7 @@ class InventoryPage extends StatefulWidget {
 class _InventoryPageState extends State<InventoryPage> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   DateTimeRange? _dateRange;
-  final currencyFormat = NumberFormat.currency(symbol: '\$');
+  final currencyFormat = NumberFormat.currency(symbol: 'Tsh ');
   Future<Map<String, dynamic>>? _reportFuture;
 
 

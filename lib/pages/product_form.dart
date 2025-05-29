@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:stock_manager/utils/haptic_feedback_helper.dart';
 import 'dart:io';
 import '../controllers/product_controller.dart';
 
@@ -178,7 +179,11 @@ class _ProductFormState extends State<ProductForm> {
       width: double.infinity,
       height: 50,
       child: ElevatedButton(
-        onPressed: _isUploading ? null : _submitForm,
+        // onPressed: _isUploading ? null : _submitForm,
+        onPressed: () async {
+          await HapticFeedbackHelper.selectionClick();
+          _isUploading ? null : _submitForm();
+        },
         style: ElevatedButton.styleFrom(
           backgroundColor: Theme.of(context).colorScheme.primary,
           shape: RoundedRectangleBorder(

@@ -18,8 +18,11 @@ class ProductCubit extends Cubit<ProductState> {
   static String get baseUrl => Env.baseUrl;
 
   ProductCubit(this.dbHelper) : super(ProductLoading()) {
-    loadProducts(); // Quick local load
-    Future.microtask(() => fetchProducts()); // Remote override
+    // First load from local DB
+    loadProducts().then((_) {
+      // Then try to fetch from server
+      Future.microtask(() => fetchProducts());
+    });
   }
 
   Future<void> loadProducts() async {
@@ -78,10 +81,11 @@ class ProductCubit extends Cubit<ProductState> {
         final recent = (data['recentMovements'] as List)
             .map((json) => StockMovement.fromJson(json))
             .toList();
-
+print('ALL-STATS: ${stats['salesTrend']}');
         emit(ProductLoaded(
           products: state is ProductLoaded ? (state as ProductLoaded).products : [],
           stats: stats,
+          // salesTrend: data['stats']['salesTrend'] ?? [],
           recentMovements: recent,
         ));
 
@@ -200,6 +204,35 @@ class ProductCubit extends Cubit<ProductState> {
     }
   }
 
+  Future<void> deleteProduct(int productId) async {
+    try {
+      final token = await AuthHelper.getToken();
+      final response = await http.delete(
+        Uri.parse('$baseUrl/products/$productId'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        // Remove from local state
+        if (state is ProductLoaded) {
+          final currentState = state as ProductLoaded;
+          emit(ProductLoaded(
+            products: currentState.products.where((p) => p.id != productId).toList(),
+            stats: currentState.stats,
+            recentMovements: currentState.recentMovements,
+          ));
+        }
+      } else {
+        throw Exception('Failed to delete product');
+      }
+    } catch (e) {
+      emit(ProductError('Failed to delete product: ${e.toString()}'));
+      rethrow;
+    }
+  }
 
 }
 
@@ -215,14 +248,16 @@ class ProductLoading extends ProductState {
 
 class ProductLoaded extends ProductState {
   final List<Product> products;
-  final List<StockMovement> recentMovements;
   final Map<String, dynamic>? stats;  // Add stats field
+  final List<StockMovement> recentMovements;
+  final List<dynamic> salesTrend;
 
 
   ProductLoaded({
     required this.products,
-    this.recentMovements = const [],
     this.stats,
+    this.recentMovements = const [],
+    this.salesTrend = const [],
   });
 }
 

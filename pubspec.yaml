@@ -43,8 +43,11 @@ dependencies:
   connectivity_plus: ^6.1.4
   http:
   mime:
-  fl_chart:
+  fl_chart: ^0.63.0
   syncfusion_flutter_charts:
+  page_transition: ^2.0.9
+  flutter_vibrate:
+
 
 dev_dependencies:
   flutter_test:

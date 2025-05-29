@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stock_manager/config/env.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:stock_manager/models/product.dart';
+import 'package:stock_manager/utils/currency_helper.dart';
+import 'package:stock_manager/utils/dialog_helper.dart';
 import '../controllers/product_controller.dart';
 import 'product_details.dart';
 
@@ -20,6 +23,21 @@ class _ProductsPageState extends State<ProductsPage> {
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  void _deleteProduct(int productId) async {
+    final shouldDelete = await DialogHelper.showConfirmationDialog(
+      context: context,
+      title: AppLocalizations.of(context)!.deleteConfirmation,
+      confirmText: AppLocalizations.of(context)!.confirm,
+      cancelText: AppLocalizations.of(context)!.cancel,
+      // context: context,
+      // title: 'Delete Product',
+      content: 'Are you sure you want to delete this product?',
+    );
+    if (shouldDelete) {
+      context.read<ProductCubit>().deleteProduct(productId);
+    }
   }
 
   @override
@@ -53,7 +71,7 @@ class _ProductsPageState extends State<ProductsPage> {
                 child: TextField(
                   controller: _searchController,
                   decoration: InputDecoration(
-                    hintText: 'Search products...',
+                    hintText: AppLocalizations.of(context)?.products,//'Search products...',
                     prefixIcon: const Icon(Icons.search),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -193,7 +211,7 @@ class _ProductsPageState extends State<ProductsPage> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '\$${product.basePrice.toStringAsFixed(2)}',
+                      CurrencyHelper.formatCurrency(context, product.basePrice),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Theme.of(context).colorScheme.primary,
                       ),

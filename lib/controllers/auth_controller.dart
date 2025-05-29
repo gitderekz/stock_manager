@@ -2,6 +2,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stock_manager/utils/auth_helper.dart';
 import '../utils/database_helper.dart';
+import 'package:stock_manager/config/env.dart';
 
 // Update auth_controller.dart
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,7 +12,7 @@ import '../utils/database_helper.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   final DatabaseHelper dbHelper;
-  static const String baseUrl = 'http://192.168.8.101:5000/api';
+  static String baseUrl = '${Env.baseUrl}';
 
   AuthCubit(this.dbHelper) : super(AuthInitial());
 

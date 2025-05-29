@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stock_manager/pages/products_page.dart';
 import 'package:stock_manager/pages/settings_page.dart';
+import 'package:stock_manager/pages/tutorial_overlay.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../controllers/theme_controller.dart';
 import 'dashboard_page.dart';
 import 'inventory_page.dart';
@@ -26,6 +28,9 @@ class _MainNavigationState extends State<MainNavigation> {
       const InventoryPage(),
       const SettingsPage(),
     ];
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      TutorialOverlay.showTutorialIfNeeded(context);
+    });
   }
 
   @override
@@ -103,11 +108,11 @@ class _MainNavigationState extends State<MainNavigation> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildNavItem(context, 0, Icons.home_outlined, 'Home'),
-              _buildNavItem(context, 1, Icons.inventory_2_outlined, 'Products'),
+              _buildNavItem(context, 0, Icons.home_outlined, AppLocalizations.of(context)?.dashboard??'Home'),
+              _buildNavItem(context, 1, Icons.inventory_2_outlined, AppLocalizations.of(context)?.products??'Products'),
               const SizedBox(width: 40), // Space for FAB
-              _buildNavItem(context, 2, Icons.assessment_outlined, 'Inventory'),
-              _buildNavItem(context, 3, Icons.settings_outlined, 'Settings'),
+              _buildNavItem(context, 2, Icons.assessment_outlined, AppLocalizations.of(context)?.inventory??'Inventory'),
+              _buildNavItem(context, 3, Icons.settings_outlined, AppLocalizations.of(context)?.settings??'Settings'),
             ],
           ),
         ),
@@ -115,8 +120,7 @@ class _MainNavigationState extends State<MainNavigation> {
     );
   }
 
-  Widget _buildNavItem(BuildContext context, int index, IconData icon,
-      String label) {
+  Widget _buildNavItem(BuildContext context, int index, IconData icon, String label) {
     final isSelected = _currentIndex == index;
     return Expanded(
       child: InkWell(

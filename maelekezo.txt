@@ -106,32 +106,251 @@ GIVEN
 
 
 
+
+
+
+If this is how i set my online server
+server {
+    listen 80;
+    server_name stock-management-api.gexperten.tech;
+
+    # WebSocket support for socket.io
+    location /socket.io/ {
+        proxy_pass http://localhost:3007;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+    }
+
+    location / {
+        proxy_pass http://localhost:3007;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location / {
+            proxy_pass http://localhost:3007;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+}
+
+Will the mobile app be able to connect with socket if this is configuration?
+SOCKET_URL=https://stock-management-api
+
+because i get error
+[
+I/flutter (25230): Reconnect error: SocketException: Failed host lookup: 'stock-management-api' (OS Error: No address associated with hostname, errno = 7)]
+
+nano /etc/nginx/sites-available/stock-management-api.gexperten.tech.conf
+nano /etc/nginx/sites-available/portfolio.gexperten.tech.conf
+nano /etc/nginx/sites-available/school-management.gexperten.tech.conf
+
+ln -s /etc/nginx/sites-available/stock-management-api.gexperten.tech.conf /etc/nginx/sites-enabled/
+certbot --nginx -d stock-management-api.gexperten.tech
+
+
+
 --------------------------------------------------------------
-Lets solve these problems
--When i open the report page it always shows [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled Exception: Exception: Error fetching report], I cant even see the date filter
--When i log     console.log("PARAMS = > ",startDate, endDate, productId ); it gives null null null
--It always fail when reach here, So it should be handled correctly
-const sales = await StockMovement.findAll({
-      where,
-      include: [{
-        model: Product,
-        as: 'product',
-        attributes: ['id', 'name', 'base_price']
-      }, {
-        model: User,
-        as: 'user',
-        attributes: ['id', 'username']
-      }],
-      order: [['movement_date', 'DESC']]
-    });
 
 
--I want and even if no date selected should be able to display the page
+Hello, here are some of my codes
+
+lib/controllers/product_controller.dart
 
 
--I want by default to fetch weekly report,
-
--Also lets add filter for the product
 
 
+lib/controllers/settings_controller.dart
+
+
+
+
+lib/pages/settings_page.dart
+
+
+
+
+lib/utils/api_service.dart
+
+
+
+
+lib/models/product.dart
+
+
+
+
+lib/models/stock_movement.dart
+
+
+
+
+lib/main.dart
+
+
+
+
+
+BACKEND
+"C:\dev\web\stock-management-system\backend\app.js"
+
+
+
+
+"C:\dev\web\stock-management-system\backend\routes\stockMovementRoutes.js"
+
+
+
+
+"C:\dev\web\stock-management-system\backend\routes\productRoutes.js"
+
+
+
+
+"C:\dev\web\stock-management-system\backend\routes\settingRoutes.js"
+
+
+
+
+"C:\dev\web\stock-management-system\backend\controllers\productController.js"
+
+
+
+
+"C:\dev\web\stock-management-system\backend\controllers\settingController.js"
+
+
+
+
+"C:\dev\web\stock-management-system\backend\controllers\stockMovementController.js"
+
+
+
+
+"C:\dev\web\stock-management-system\backend\models\Inventory.js"
+
+
+
+
+"C:\dev\web\stock-management-system\backend\models\product.js"
+
+
+
+
+"C:\dev\web\stock-management-system\backend\models\setting.js"
+
+
+
+
+"C:\dev\web\stock-management-system\backend\models\stockMovement.js"
+
+
+
+
+
+
+What i want is
+--->When there is no server connection/server response is null/error then it should pull all data from the local database products,stock movement & inventory e.t.c
+GIVEN THIS IS THE PAYLOAD FROM SETTINGS GET,
+[{id: 1, setting_key: company_name, setting_value: Stock Manager Inc., createdAt: null, updatedAt: null}, {id: 2, setting_key: default_currency, setting_value: Tsh, createdAt: null, updatedAt: null}, {id: 3, setting_key: low_stock_alert, setting_value: true, createdAt: null, updatedAt: null}, {id: 4, setting_key: sync_interval, setting_value: 300, createdAt: null, updatedAt: null}, {id: 5, setting_key: theme, setting_value: light, createdAt: null, updatedAt: null}, {id: 6, setting_key: language, setting_value: en, createdAt: null, updatedAt: null}, {id: 7, setting_key: notification_enabled, setting_value: true, createdAt: null, updatedAt: null}, {id: 8, setting_key: offline_mode, setting_value: false, createdAt: null, updatedAt: null}, {id: 9, setting_key: backup_schedule, setting_value: daily, createdAt: null, updatedAt: null}, {id: 10, setting_key: tax_rate, setting_value: 7.5, createdAt: null, updatedAt: null}]
+--->Wnen i change any settings language/theme/currency it sends a post request. and gives an error
+[
+
+E/flutter (29486): [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled Exception: Exception: Failed to update setting
+E/flutter (29486): #0      SettingsCubit.updateSetting (package:stock_manager/controllers/settings_controller.dart:69:11)
+E/flutter (29486): <asynchronous suspension>
+E/flutter (29486): #1      _SettingsView._buildLanguageCard.<anonymous closure>.<anonymous closure> (package:stock_manager/pages/settings_page.dart:106:25)
+E/flutter (29486): <asynchronous suspension>
+E/flutter (29486):
+]
+But i think it should send a put request instead what do you think?
+
+--->aLSO After i synchronise data from the settings page i get an error
+[
+Stock update received
+E/flutter (29486): [ERROR:flutter/runtime/dart_vm_initializer.cc(41)] Unhandled Exception: Error: Could not find the correct Provider<ProductCubit> above this MyApp Widget
+E/flutter (29486):
+E/flutter (29486): This happens because you used a `BuildContext` that does not include the provider
+E/flutter (29486): of your choice. There are a few common scenarios:
+E/flutter (29486):
+E/flutter (29486): - You added a new provider in your `main.dart` and performed a hot-reload.
+E/flutter (29486):   To fix, perform a hot-restart.
+E/flutter (29486):
+E/flutter (29486): - The provider you are trying to read is in a different route.
+E/flutter (29486):
+E/flutter (29486):   Providers are "scoped". So if you insert of provider inside a route, then
+E/flutter (29486):   other routes will not be able to access that provider.
+E/flutter (29486):
+E/flutter (29486): - You used a `BuildContext` that is an ancestor of the provider you are trying to read.
+E/flutter (29486):
+E/flutter (29486):   Make sure that MyApp is under your MultiProvider/Provider<ProductCubit>.
+E/flutter (29486):   This usually happens when you are creating a provider and trying to read it immediately.
+E/flutter (29486):
+E/flutter (29486):   For example, instead of:
+E/flutter (29486):
+E/flutter (29486):   ```
+E/flutter (29486):   Widget build(BuildContext context) {
+E/flutter (29486):     return Provider<Example>(
+E/flutter (29486):       create: (_) => Example(),
+E/flutter (29486):       // Will throw a ProviderNotFoundError, because `context` is associated
+E/flutter (29486):       // to the widget that is the parent of `Provider<Example>`
+E/flutter (29486):       child: Text(context.watch<Example>().toString()),
+E/flutter (29486):     );
+E/flutter (29486):   }
+E/flutter (29486):   ```
+E/flutter (29486):
+E/flutter (29486):   consider using `builder` like so:
+E/flutter (29486):
+E/flutter (29486):   ```
+E/flutter (29486):   Widget build(BuildContext context) {
+E/flutter (29486):     return Provider<Example>(
+E/flutter (29486):       create: (_) => Example(),
+E/flutter (29486):       // we use `builder` to obtain a new `BuildContext` that has access to the provider
+E/flutter (29486):       builder: (context, child) {
+E/flutter (29486):         // No longer throws
+E/flutter (29486):         return Text(context.watch<Example>().toString());
+E/flutter (29486):       }
+E/flutter (29486):     );
+E/flutter (29486):   }
+E/flutter (29486):   ```
+E/flutter (29486):
+E/flutter (29486): If none of these solutions work, consider asking for help on StackOverflow:
+E/flutter (29486): https://stackoverflow.com/questions/tagged/flutter
+E/flutter (29486):
+E/flutter (29486): #0      Provider._inheritedElementOf (package:provider/src/provider.dart:377:7)
+E/flutter (29486): #1      Provider.of (package:provider/src/provider.dart:327:30)
+E/flutter (29486): #2      ReadContext.read (package:provider/src/provider.dart:683:21)
+E/flutter (29486): #3      SocketService.initialize.<anonymous closure> (package:stock_manager/utils/socket_service.dart:50:15)
+E/flutter (29486): #4      EventEmitter._emit.<anonymous closure> (package:socket_io_common/src/util/event_emitter.dart:44:14)
+E/flutter (29486): #5      List.forEach (dart:core-patch/growable_array.dart:416:8)
+E/flutter (29486): #6      EventEmitter._emit (package:socket_io_common/src/util/event_emitter.dart:43:11)
+E/flutter (29486): #7      EventEmitter.emit (package:socket_io_common/src/util/event_emitter.dart:37:46)
+E/flutter (29486): #8      Function._apply (dart:core-patch/function_patch.dart:11:71)
+E/flutter (29486): #9      Function.apply (dart:core-patch/function_patch.dart:35:12)
+E/flutter (29486): #10     Socket.emitEvent (package:socket_io_client/src/socket.dart:467:16)
+E/flutter (29486): #11     Socket.onevent (package:socket_io_client/src/socket.dart:450:7)
+E/flutter (29486): #12     Socket.onpacket (package:socket_io_client/src/socket.dart:415:9)
+E/flutter (29486): #13     EventEmitter._emit.<anonymous closure> (package:socket_io_common/src/util/event_emitter.dart:44:14)
+E/flutter (29486): #14     List.forEach (dart:core-patch/growable_array.dart:416:8)
+E/flutter (29486): #15     EventEmitter._emit (package:socket_io_common/src/util/event_emitter.dart:43:11)
+E/flutter (29486): #16     EventEmitter.emitReserved (package:socket_io_common/src/util/event_emitter.dart:57:47)
+E/flutter (29486): #17     Manager.ondecoded.<anonymous closure> (package:socket_io_client/src/manager.dart:276:7)
+E/flutter (29486): #18     new Future.microtask.<anonymous closure> (dart:async/future.dart:280:37)
+E/flutter (29486): #19     _microtaskLoop (dart:async/schedule_microtask.dart:40:21)
+E/flutter (29486): #20     _startMicrotaskLoop (dart:async/schedule_microtask.dart:49:5)
+E/flutter (29486):
+
+]
+
+--->Make all states/cubits functionable from the main.dart if you find anything out of place
+--->Is the tutorial page ok on where & how it is supposed to be? if any change needed let's implement it
 
