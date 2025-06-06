@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:stock_manager/models/stock_movement.dart';
@@ -197,6 +198,8 @@ class _DashboardPageState extends State<DashboardPage> {
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: Theme.of(context).colorScheme.onSurface,
+                      fontSize: title=='Inventory Value'?14:null,
+                      overflow: TextOverflow.ellipsis
                   ),
                 ),
               ],

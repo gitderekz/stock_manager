@@ -354,3 +354,13 @@ E/flutter (29486):
 --->Make all states/cubits functionable from the main.dart if you find anything out of place
 --->Is the tutorial page ok on where & how it is supposed to be? if any change needed let's implement it
 
+Also what about these farmers
+1. Anuary
+2. Emmanuel
+3. Dante
+4. Adam
+5. Sadiki
+Are their loan ok?
+
+Or it is just Jimmy who faces problems in deducions
+6796 -> 7139 ->
