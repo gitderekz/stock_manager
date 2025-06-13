@@ -4,6 +4,7 @@ import 'package:stock_manager/pages/products_page.dart';
 import 'package:stock_manager/pages/settings_page.dart';
 import 'package:stock_manager/pages/tutorial_overlay.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:stock_manager/utils/auth_helper.dart';
 import '../controllers/theme_controller.dart';
 import 'dashboard_page.dart';
 import 'inventory_page.dart';
@@ -46,7 +47,27 @@ class _MainNavigationState extends State<MainNavigation> {
 
   Widget _buildFloatingActionButton(BuildContext context) {
     return FloatingActionButton(
-      onPressed: () => Navigator.pushNamed(context, '/add-product'),
+      // onPressed: () => Navigator.pushNamed(context, '/add-product'),
+      onPressed: () async {
+        final user = await AuthHelper.getUser();
+        final isAdmin = user?['role'] == 'admin';
+
+        if (!isAdmin) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('You do not have access to add products'),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          );
+          return;
+        }
+
+        Navigator.pushNamed(context, '/add-product');
+      },
+
       backgroundColor: Theme
           .of(context)
           .colorScheme

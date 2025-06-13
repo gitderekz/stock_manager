@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stock_manager/config/env.dart';
 import 'package:stock_manager/controllers/auth_controller.dart';
 import 'package:stock_manager/controllers/stock_controller.dart';
+import 'package:stock_manager/utils/auth_helper.dart';
 import '../controllers/product_controller.dart';
 import '../models/product.dart';
 import '../models/stock_movement.dart';
@@ -18,17 +19,32 @@ class ProductDetailsPage extends StatefulWidget {
 
 class _ProductDetailsPageState extends State<ProductDetailsPage> {
   final _quantityController = TextEditingController();
-  String _movementType = 'in';
+  String _movementType = 'out';
+  Map<String, dynamic>? _user;
 
   @override
   void initState() {
     super.initState();
     _quantityController.text = '1';
+
+    AuthHelper.getUser().then((user) {
+      final isAdmin = user?['role'] == 'admin';
+      print('user: ${user?['role']} : ${isAdmin}');
+      setState(() {
+        _user = user;
+        if (!isAdmin) {
+          _movementType = 'out'; // auto-select for non-admins
+        }
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final isLowStock = widget.product.quantity <= widget.product.lowStockThreshold;
+    if (_user == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
@@ -168,10 +184,15 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                                 ),
                                 child: DropdownButton<String>(
                                   value: _movementType,
-                                  items: const [
-                                    DropdownMenuItem(value: 'in', child: Text('Stock In')),
-                                    DropdownMenuItem(value: 'out', child: Text('Stock Out')),
+                                  items: _user?['role'] == 'admin' ?
+                                  [
+                                    const DropdownMenuItem(value: 'in', child: Text('Stock In')),
+                                    const DropdownMenuItem(value: 'out', child: Text('Stock Out')),
+                                  ] :
+                                  [
+                                    const DropdownMenuItem(value: 'out', child: Text('Stock Out')),
                                   ],
+
                                   onChanged: (value) => setState(() => _movementType = value!),
                                   underline: const SizedBox(),
                                   isExpanded: true,
@@ -213,7 +234,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                               shadowColor: Theme.of(context).colorScheme.primary.withOpacity(0.3),
                             ),
                             child: Text(
-                              'Record Movement',
+                              'Record Movement ${_movementType=='in'?"(BUY)":"(SELL)"}',
                               style: Theme.of(context).textTheme.labelLarge?.copyWith(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
